@@ -1,0 +1,178 @@
+<script>
+  import GameCard from './cardGame.vue'
+
+  export default{
+    components: {
+      GameCard
+    },
+    data() {
+      return {
+        games: [
+          { id: 1, name: "Змейка", price: 1999, img: "", purchased: false },
+          { id: 2, name: "The Witcher 3", price: 1299, img: "", purchased: false },
+          { id: 3, name: "Hollow Knight", price: 399, img: "", purchased: false },
+          { id: 4, name: "Cyberpunk 2077", price: 2499, img: "", purchased: false },
+          { id: 5, name: "Minecraft", price: 999, img: "", purchased: false },
+          { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false }
+      ],
+        cart: []
+      }
+    },
+    computed: {
+      cartCount() {
+        return this.cart.length
+      }
+    },
+    methods: {
+      addToCart(game) {
+    // Находим игру и меняем статус
+      const foundGame = this.games.find(g => g.name === game.name)
+      if (foundGame) {
+        foundGame.purchased = true
+        this.cart.push({ name: game.name, price: game.price })
+      
+        localStorage.setItem('games', JSON.stringify(this.games))
+        localStorage.setItem('cart', JSON.stringify(this.cart))
+      
+        }
+      },
+  
+      removeFromCart(game) {
+    // Находим игру и меняем статус
+        const foundGame = this.games.find(g => g.name === game.name)
+        if (foundGame) {
+          foundGame.purchased = false
+          const index = this.cart.findIndex(item => item.name === game.name)
+          if (index !== -1) {
+            this.cart.splice(index, 1)
+          }
+      
+          localStorage.setItem('games', JSON.stringify(this.games))
+          localStorage.setItem('cart', JSON.stringify(this.cart))
+      
+        }
+      },
+    },
+
+    mounted() {
+      const savedGames = localStorage.getItem('games')
+      if (savedGames) {
+        this.games = JSON.parse(savedGames)
+      }
+    
+    // Загружаем корзину
+      const savedCart = localStorage.getItem('cart')
+      if (savedCart) {
+        this.cart = JSON.parse(savedCart)
+      }
+    }
+  }
+</script>
+
+
+<template>
+  <div class="app">  
+    <header>
+      <h1>🎮 Магазин игр</h1>
+      <router-link to="/cart" class="cart-link">
+        Корзина<span class="cart-count">{{ cartCount }}</span>
+      </router-link>
+    </header>
+    
+    <div class="games">
+      <game-card 
+        v-for="game in games" 
+        :key="game.id"
+        :game-id="game.id"
+        :game="game.name"
+        :price="game.price"
+        :img="game.img"
+        :is-purchased="game.purchased" 
+        @add-to-cart="addToCart"
+        @remove-from-cart="removeFromCart"
+
+      />
+    </div>
+  </div>
+</template>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+/* Главный контейнер с центрированием */
+.app {
+  max-width: 1500px;     /* Ограничиваем ширину */
+  margin: 0 auto;        /* Центрируем */
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  color: #333;
+  font-size: 2.5em;
+}
+
+/* Сетка карточек */
+.games {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);  
+  justify-content: center;
+  gap: 25px;
+}
+
+.cart-link {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  font-size: 24px;
+  padding: 12px 18px;
+  border-radius: 50px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.cart-count {
+  background: red;
+  color: white;
+  font-size: 14px;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+/* На планшетах - 2 колонки */
+@media (max-width: 900px) {
+  .games {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+@media (max-width: 600px) {
+  .games {
+    grid-template-columns: 1fr;
+  }
+  
+  .app {
+    padding: 20px;
+  }
+}
+</style>

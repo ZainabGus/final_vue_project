@@ -1,15 +1,20 @@
 <script>
     export default {
         props: {
+            gameId: Number,
             game: String, //название игры
             price: Number, //цена
-            img: String //картинка
+            img: String, //картинка
+            isPurchased: {       // 🆕 получаем статус от родителя
+            type: Boolean,
+            default: false
+        }
         },
 
         data() {
             return {
                 button: "Добавить в корзину",
-                isClicked: false
+                isClicked: this.isPurchased
             }
         },
 
@@ -17,12 +22,20 @@
             toggle() {
                 this.isClicked = !this.isClicked;
                 if(this.isClicked) {
-                    this.button = "Удалить из корзины"
+                    this.button = "Удалить из корзины";
+                    this.$emit('add-to-cart', { name: this.game, price: this.price });
                 }else{
-                    this.button = "Добавить в корзину"
+                    this.button = "Добавить в корзину";
+                    this.$emit('remove-from-cart', { name: this.game, price: this.price })
                 }
             }
         },
+        watch: {
+          isPurchased(newVal) {
+            this.isClicked = newVal
+            this.button = newVal ? "Удалить из корзины" : "Добавить в корзину"
+          }
+        }
     };
 
 </script> 
