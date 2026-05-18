@@ -7,12 +7,12 @@ export default {
     },
     computed: {
         count() {
-            let k = this.cart.length
+            let k = this.cart.length;
             return k
         }    
     },
     mounted() {
-        const savedCart = localStorage.getItem('cart')
+        const savedCart = localStorage.getItem('cart');
         if (savedCart) {
         this.cart = JSON.parse(savedCart)
         }
@@ -23,6 +23,36 @@ export default {
                 this.cart = []
                 localStorage.setItem('cart', JSON.stringify(this.cart))
             }
+        },
+        buyGame(index) {
+            const game = this.cart[index];
+            this.cart.splice(index, 1)
+            this.saveCart()
+
+            const savedGames = localStorage.getItem('games')
+            if (savedGames) {
+                let games = JSON.parse(savedGames)
+                const foundGame = games.find(g => g.name === game.name)
+                if (foundGame) {
+                    foundGame.purchased = true  // Игра куплена!
+                };
+                localStorage.setItem('games', JSON.stringify(games));
+
+            }
+            alert(`🎉 Поздравляем! Вы купили "${game.name}"! Перейдите на главную страницу и начните играть`);
+        },
+
+        removeGame(index) {
+            const game = this.cart[index]
+            if (confirm(`Удалить "${game.name}" из корзины?`)) {
+                this.cart.splice(index, 1)
+                this.saveCart()
+                alert(`❌ "${game.name}" удалена из корзины`)
+            }
+        },
+
+        saveCart() {
+            localStorage.setItem('cart', JSON.stringify(this.cart))
         }
     } 
 
@@ -41,12 +71,24 @@ export default {
         <div v-else>
             <div v-for="(item, index) in cart" :key="index" class="cart-item">
                 <span>{{ item.name }}</span>
-                <span>{{ item.price }} ₽</span>
+                
+
+                <div class="button">
+                    <span class="money">{{ item.price }} ₽</span>
+                    <button @click="buyGame(index)" class="buy-cart-btn">
+                        Купить
+                    </button>
+                    <button @click="removeGame(index)" class="remove-btn">
+                        ❌
+                    </button>
+                </div>
             </div>
+
+            <button @click="clearCart" class="clear-btn">
+                🗑️ Очистить корзину
+            </button>
         </div>
-    <button @click="clearCart" class="clear-btn">
-      🗑️ Очистить корзину
-    </button>
+    
     </div>
 </template>
 
@@ -60,7 +102,38 @@ export default {
 .cart-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+  align-items: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.button {
+  display: flex;
+  gap: 10px;
+}
+
+.buy-cart-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.remove-btn {
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.money {
+    font-size: 20px;
+    color: green;
 }
 </style>

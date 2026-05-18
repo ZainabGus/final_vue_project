@@ -5,35 +5,47 @@
             game: String, //название игры
             price: Number, //цена
             img: String, //картинка
-            isPurchased: {       // 🆕 получаем статус от родителя
-            type: Boolean,
-            default: false
-        }
-        },
-
-        data() {
-            return {
-                button: "Добавить в корзину",
-                isClicked: this.isPurchased
+            isPurchased: {  //получаем статус от родителя
+              type: Boolean,
+              default: false
+            },
+            isInCart: {          
+              type: Boolean,
+              default: false
             }
+            
         },
 
         methods: {
-            toggle() {
-                this.isClicked = !this.isClicked;
-                if(this.isClicked) {
-                    this.button = "Удалить из корзины";
-                    this.$emit('add-to-cart', { name: this.game, price: this.price });
-                }else{
-                    this.button = "Добавить в корзину";
-                    this.$emit('remove-from-cart', { name: this.game, price: this.price })
-                }
+          addToCart() {
+            this.$emit('add-to-cart', { 
+              id: this.gameId,
+              name: this.game, 
+              price: this.price 
+            })
+          },
+    
+          removeFromCart() {
+            this.$emit('remove-from-cart', { 
+              id: this.gameId,
+              name: this.game, 
+              price: this.price 
+            })
+          },
+    
+          playGame() {
+            this.$emit('play-game', { 
+              name: this.game 
+            })
+          },
+
+          resetGame() {
+            if (confirm(`Сбросить прогресс игры "${this.game}"? Она снова станет доступна для покупки.`)) {
+              this.$emit('reset-game', { 
+                id: this.gameId,
+                name: this.game 
+              })
             }
-        },
-        watch: {
-          isPurchased(newVal) {
-            this.isClicked = newVal
-            this.button = newVal ? "Удалить из корзины" : "Добавить в корзину"
           }
         }
     };
@@ -44,8 +56,37 @@
     <div class="game-card">
         <h3 class="card-text">{{game}}</h3>
         <img class="card-image" :src="img">
-        <p class="price">{{price}}₽</p>
-        <button :class="{'active': isClicked, 'buy-btn': !isClicked }" @click="toggle">{{button}}</button>
+        <p v-if="!isPurchased" class="price">{{price}}₽</p>
+
+        <button v-if="isPurchased" @click="resetGame" class="remove-btn">
+          ✕ Удалить
+        </button>
+
+        <button 
+          v-if="!isInCart && !isPurchased" 
+          @click="addToCart" 
+          class="buy-btn"
+        >
+          Добавить в корзину
+        </button>
+    
+    <!-- Кнопка 2: игра В корзине, но НЕ куплена -->
+        <button 
+          v-else-if="isInCart && !isPurchased" 
+          @click="removeFromCart" 
+          class="remove-btn"
+        >
+          Удалить из корзины
+        </button>
+    
+    <!-- Кнопка 3: игра КУПЛЕНА -->
+        <button 
+          v-else-if="isPurchased" 
+          @click="playGame" 
+          class="play-btn"
+        >
+          Играть 🎮 
+        </button>
     </div>
 
 </template>
@@ -119,16 +160,39 @@
   background: #2a92c9;
 }
 
-.active {
+.remove-btn {
   width: 100%;
-  padding: 14px;  
+  padding: 14px;
+  background: #ff4444;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 18px;  
+  font-size: 18px;
   cursor: pointer;
   transition: background 0.3s ease;
   margin-top: 15px;
-  background: #eb4f46;
 }
+
+.remove-btn:hover {
+  background: #cc0000;
+}
+
+.play-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 15px;
+}
+
+.play-btn:hover {
+  background: #0b7dda;
+}
+
+
 </style>

@@ -8,12 +8,12 @@
     data() {
       return {
         games: [
-          { id: 1, name: "Змейка", price: 1999, img: "", purchased: false },
-          { id: 2, name: "The Witcher 3", price: 1299, img: "", purchased: false },
-          { id: 3, name: "Hollow Knight", price: 399, img: "", purchased: false },
-          { id: 4, name: "Cyberpunk 2077", price: 2499, img: "", purchased: false },
-          { id: 5, name: "Minecraft", price: 999, img: "", purchased: false },
-          { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false }
+          { id: 1, name: "Змейка", price: 1999, img: "", purchased: false, inCart: false },
+      { id: 2, name: "The Witcher 3", price: 1299, img: "", purchased: false, inCart: false },
+      { id: 3, name: "Hollow Knight", price: 399, img: "", purchased: false, inCart: false },
+      { id: 4, name: "Cyberpunk 2077", price: 2499, img: "", purchased: false, inCart: false },
+      { id: 5, name: "Minecraft", price: 999, img: "", purchased: false, inCart: false },
+      { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false, inCart: false }
       ],
         cart: []
       }
@@ -26,32 +26,60 @@
     methods: {
       addToCart(game) {
     // Находим игру и меняем статус
-      const foundGame = this.games.find(g => g.name === game.name)
-      if (foundGame) {
-        foundGame.purchased = true
-        this.cart.push({ name: game.name, price: game.price })
-      
-        localStorage.setItem('games', JSON.stringify(this.games))
-        localStorage.setItem('cart', JSON.stringify(this.cart))
-      
-        }
-      },
-  
-      removeFromCart(game) {
-    // Находим игру и меняем статус
         const foundGame = this.games.find(g => g.name === game.name)
-        if (foundGame) {
-          foundGame.purchased = false
-          const index = this.cart.findIndex(item => item.name === game.name)
-          if (index !== -1) {
-            this.cart.splice(index, 1)
-          }
+        if (foundGame && !foundGame.purchased && !foundGame.inCart) {
+          foundGame.inCart = true
+          this.cart.push({ name: game.name, price: game.price })
       
           localStorage.setItem('games', JSON.stringify(this.games))
           localStorage.setItem('cart', JSON.stringify(this.cart))
       
+          }
+        },
+  
+        removeFromCart(game) {
+    // Находим игру и меняем статус
+          const foundGame = this.games.find(g => g.name === game.name)
+          if (foundGame) {
+            foundGame.inCart = false
+            const index = this.cart.findIndex(item => item.name === game.name)
+            if (index !== -1) {
+              this.cart.splice(index, 1)
+            }
+      
+            localStorage.setItem('games', JSON.stringify(this.games))
+            localStorage.setItem('cart', JSON.stringify(this.cart))
+      
+          }
+        },
+
+        playGame(game) {
+          if (game.name === "Змейка") {
+            // Открываем игру в новой вкладке
+            window.open('/games/snake/index.html', '_blank')
+          } else {
+            alert(`🎮 Игра "${game.name}" скоро появится!`)
+          }
+        },
+
+        resetGame(game) {
+          const foundGame = this.games.find(g => g.id === game.id)
+          if (foundGame) {
+          // Сбрасываем статусы
+            foundGame.purchased = false
+            foundGame.inCart = false
+      
+          // Удаляем из корзины, если там была
+            const cartIndex = this.cart.findIndex(item => item.name === game.name)
+            if (cartIndex !== -1) {
+              this.cart.splice(cartIndex, 1)
+            }
+      
+      // Сохраняем
+            localStorage.setItem('games', JSON.stringify(this.games))
+            localStorage.setItem('cart', JSON.stringify(this.cart))
+          }
         }
-      },
     },
 
     mounted() {
@@ -65,6 +93,13 @@
       if (savedCart) {
         this.cart = JSON.parse(savedCart)
       }
+      // 🆕 Восстанавливаем inCart из корзины
+      this.cart.forEach(cartItem => {
+        const game = this.games.find(g => g.name === cartItem.name)
+        if (game) {
+          game.inCart = true
+        }
+      })
     }
   }
 </script>
@@ -87,9 +122,12 @@
         :game="game.name"
         :price="game.price"
         :img="game.img"
-        :is-purchased="game.purchased" 
+        :is-purchased="game.purchased"
+        :is-in-cart="game.inCart"
         @add-to-cart="addToCart"
         @remove-from-cart="removeFromCart"
+        @play-game="playGame"
+        @reset-game="resetGame" 
 
       />
     </div>
