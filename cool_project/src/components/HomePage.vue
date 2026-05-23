@@ -9,12 +9,12 @@
       return {
         games: [
           { id: 1, name: "Змейка", price: 1999, img: "", purchased: false, inCart: false },
-      { id: 2, name: "The Witcher 3", price: 1299, img: "", purchased: false, inCart: false },
-      { id: 3, name: "Hollow Knight", price: 399, img: "", purchased: false, inCart: false },
-      { id: 4, name: "Cyberpunk 2077", price: 2499, img: "", purchased: false, inCart: false },
-      { id: 5, name: "Minecraft", price: 999, img: "", purchased: false, inCart: false },
-      { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false, inCart: false }
-      ],
+          { id: 2, name: "The Witcher 3", price: 1299, img: "", purchased: false, inCart: false },
+          { id: 3, name: "Hollow Knight", price: 399, img: "", purchased: false, inCart: false },
+          { id: 4, name: "Cyberpunk 2077", price: 2499, img: "", purchased: false, inCart: false },
+          { id: 5, name: "Minecraft", price: 999, img: "", purchased: false, inCart: false },
+          { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false, inCart: false }
+        ],
         cart: []
       }
     },
@@ -109,6 +109,10 @@
   <div class="app">  
     <header>
       <h1>🎮 Магазин игр</h1>
+      <div class="mb-3">
+        <label for="search" class="form-label"></label>
+        <input type="text" class="form-control" id="search" placeholder="search">
+      </div>
       <router-link to="/cart" class="cart-link">
         Корзина<span class="cart-count">{{ cartCount }}</span>
       </router-link>

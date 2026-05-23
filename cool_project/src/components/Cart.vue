@@ -75,16 +75,16 @@ export default {
 
                 <div class="button">
                     <span class="money">{{ item.price }} ₽</span>
-                    <button @click="buyGame(index)" class="buy-cart-btn">
+                    <button @click="buyGame(index)" type="button" class="btn btn-success">
                         Купить
                     </button>
-                    <button @click="removeGame(index)" class="remove-btn">
+                    <button @click="removeGame(index)" type="button" class="btn btn-danger">
                         ❌
                     </button>
                 </div>
             </div>
 
-            <button @click="clearCart" class="clear-btn">
+            <button @click="clearCart" type="button" class="btn btn-secondary">
                 🗑️ Очистить корзину
             </button>
         </div>

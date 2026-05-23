@@ -58,14 +58,14 @@
         <img class="card-image" :src="img">
         <p v-if="!isPurchased" class="price">{{price}}₽</p>
 
-        <button v-if="isPurchased" @click="resetGame" class="remove-btn">
+        <button v-if="isPurchased" @click="resetGame" type="button" class="btn btn-danger">
           ✕ Удалить
         </button>
 
         <button 
           v-if="!isInCart && !isPurchased" 
           @click="addToCart" 
-          class="buy-btn"
+          type="button" class="btn btn-primary"
         >
           Добавить в корзину
         </button>
@@ -74,7 +74,7 @@
         <button 
           v-else-if="isInCart && !isPurchased" 
           @click="removeFromCart" 
-          class="remove-btn"
+          type="button" class="btn btn-danger"
         >
           Удалить из корзины
         </button>
@@ -83,7 +83,7 @@
         <button 
           v-else-if="isPurchased" 
           @click="playGame" 
-          class="play-btn"
+          type="button" class="btn btn-success"
         >
           Играть 🎮 
         </button>
