@@ -58,9 +58,17 @@
         <img class="card-image" :src="img">
         <p v-if="!isPurchased" class="price">{{price}}₽</p>
 
-        <button v-if="isPurchased" @click="resetGame" type="button" class="btn btn-danger">
+        <div v-if="isPurchased" class="buttons">
+        <button @click="resetGame" type="button" class="btn btn-danger">
           ✕ Удалить
         </button>
+        <button  
+          @click="playGame" 
+          type="button" class="btn btn-success"
+        >
+          Играть 🎮 
+        </button>
+        </div>
 
         <button 
           v-if="!isInCart && !isPurchased" 
@@ -79,14 +87,8 @@
           Удалить из корзины
         </button>
     
-    <!-- Кнопка 3: игра КУПЛЕНА -->
-        <button 
-          v-else-if="isPurchased" 
-          @click="playGame" 
-          type="button" class="btn btn-success"
-        >
-          Играть 🎮 
-        </button>
+   
+        
     </div>
 
 </template>
@@ -194,5 +196,10 @@
   background: #0b7dda;
 }
 
-
+.buttons {
+  display: flex;
+  flex-direction: column;  /* ← вертикальное расположение */
+  gap: 10px;               /* ← расстояние между кнопками */
+  margin-top: 15px;
+}
 </style>

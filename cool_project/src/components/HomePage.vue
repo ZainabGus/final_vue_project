@@ -15,12 +15,29 @@
           { id: 5, name: "Minecraft", price: 999, img: "", purchased: false, inCart: false },
           { id: 6, name: "Stardew Valley", price: 499, img: "", purchased: false, inCart: false }
         ],
-        cart: []
+        cart: [],
+        search: '',
+        showPurchasedOnly: false
       }
     },
     computed: {
       cartCount() {
         return this.cart.length
+      },
+      filterGames() {
+        let result = this.games
+  
+        if (this.search) {
+          result = result.filter(game => 
+            game.name.toLowerCase().includes(this.search.toLowerCase())
+          )
+        }
+    
+        if (this.showPurchasedOnly) {
+          result = result.filter(game => game.purchased === true)
+        }
+    
+        return result
       }
     },
     methods: {
@@ -82,6 +99,31 @@
         }
     },
 
+    watch: {
+      cart: {
+        deep: true,
+        handler(newCart) {
+      // Сбрасываем inCart для всех некупленных игр
+          this.games.forEach(game => {
+            if (!game.purchased) {
+              game.inCart = false
+            }
+          })
+      
+      // Устанавливаем inCart для игр, которые в корзине
+          newCart.forEach(cartItem => {
+            const game = this.games.find(g => g.name === cartItem.name)
+            if (game && !game.purchased) {
+              game.inCart = true
+            }
+          })
+      
+      // Сохраняем изменения
+          localStorage.setItem('games', JSON.stringify(this.games))
+        }
+      }
+    },
+
     mounted() {
       const savedGames = localStorage.getItem('games')
       if (savedGames) {
@@ -111,7 +153,24 @@
       <h1>🎮 Магазин игр</h1>
       <div class="mb-3">
         <label for="search" class="form-label"></label>
-        <input type="text" class="form-control" id="search" placeholder="search">
+        <input 
+        type="text" 
+        class="form-control" 
+        id="search" 
+        placeholder="search"
+        v-model="search"
+        >
+      </div>
+      <div class="form-check mb-3">
+        <input 
+          type="checkbox" 
+          class="form-check-input" 
+          id="purchasedOnly" 
+          v-model="showPurchasedOnly"
+        >
+        <label class="form-check-label" for="purchasedOnly">
+          🎮 Показать только купленные игры
+        </label>
       </div>
       <router-link to="/cart" class="cart-link">
         Корзина<span class="cart-count">{{ cartCount }}</span>
@@ -119,8 +178,9 @@
     </header>
     
     <div class="games">
+      <template v-if="filterGames.length > 0">
       <game-card 
-        v-for="game in games" 
+        v-for="game in filterGames" 
         :key="game.id"
         :game-id="game.id"
         :game="game.name"
@@ -132,8 +192,11 @@
         @remove-from-cart="removeFromCart"
         @play-game="playGame"
         @reset-game="resetGame" 
-
       />
+      </template>
+      <div v-else class="no-results">
+        😕 Игр по запросу "{{ search }}" не найдено
+      </div>
     </div>
   </div>
 </template>
@@ -198,6 +261,14 @@ header h1 {
   font-size: 14px;
   padding: 2px 8px;
   border-radius: 20px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #666;
+  grid-column: 1 / -1;
 }
 
 /* На планшетах - 2 колонки */
